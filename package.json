@@ -1,0 +1,28 @@
+{
+  "name": "lossi-bot",
+  "version": "1.0.0",
+  "description": "A telegram bot for finding the next departure(s) for Vartsalan lossi in Kustavi, Finland.",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "NODE_ENV=development nodemon bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saarinenk/lossibot.git"
+  },
+  "author": "Katri Saarinen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/saarinenk/lossibot/issues"
+  },
+  "homepage": "https://github.com/saarinenk/lossibot#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  },
+  "dependencies": {
+    "got": "^11.1.0",
+    "moment": "^2.25.1",
+    "telegraf": "^3.38.0"
+  }
+}
