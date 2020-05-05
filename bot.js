@@ -44,7 +44,14 @@ const formatMessage = (timeArray, currLocation) =>
 
 const filter = (arr) => arr.filter((time) => time > moment().format("HH:mm"));
 
-const bot = new Telegraf(process.env.LOSSI_BOT_TOKEN);
+const PORT = process.env.PORT || 3000;
+const URL = process.env.URL || "https://lossi-bot.herokuapp.com";
+const TOKEN = process.env.LOSSI_BOT_TOKEN || "";
+
+const bot = new Telegraf(TOKEN);
+
+bot.telegram.setWebhook(`${URL}/bot${TOKEN}`);
+bot.startWebhook(`/bot${TOKEN}`, null, PORT);
 
 const inlineMessageKeyboard = Markup.inlineKeyboard([
   Markup.callbackButton("Vartsala (island)", "Vartsala"),
