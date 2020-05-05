@@ -25,6 +25,7 @@
     "express": "^4.17.1",
     "got": "^11.1.0",
     "moment": "^2.25.1",
+    "moment-timezone": "^0.5.28",
     "telegraf": "^3.38.0"
   }
 }

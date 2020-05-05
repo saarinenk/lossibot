@@ -4,7 +4,7 @@ const express = require("express");
 const expressApp = express();
 
 const got = require("got");
-const moment = require("moment");
+var moment = require("moment-timezone");
 
 const getSchedule = async () => {
   try {
@@ -44,7 +44,8 @@ const formatMessage = (timeArray, currLocation) =>
     `Next departure times from ${currLocation}: \n`
   );
 
-const filter = (arr) => arr.filter((time) => time > moment().format("HH:mm"));
+const filter = (arr) =>
+  arr.filter((time) => time > moment().tz("Europe/Helsinki").format("HH:mm"));
 
 const PORT = process.env.PORT || 3000;
 const URL = process.env.URL || "https://lossi-bot.herokuapp.com";
