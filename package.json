@@ -4,6 +4,7 @@
   "description": "A telegram bot for finding the next departure(s) for Vartsalan lossi in Kustavi, Finland.",
   "main": "bot.js",
   "scripts": {
+    "start": "node bot.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "NODE_ENV=development nodemon bot.js"
   },
