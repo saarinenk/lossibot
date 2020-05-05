@@ -18,7 +18,7 @@ const getSchedule = async () => {
   }
 };
 
-const getMessage = async (location) => {
+const getMessage = async (ctx, location) => {
   const [scheduleVartsala, scheduleMainland] = await getSchedule();
   const schedule =
     location === "Vartsala" ? scheduleVartsala : scheduleMainland;
@@ -26,6 +26,12 @@ const getMessage = async (location) => {
     filter(schedule).length > 0
       ? filter(schedule).slice(0, 3)
       : schedule.slice(0, 3);
+
+  if (filter(schedule).length < 3) {
+    ctx.replyWithHTML(
+      "The ferry stops running around 23 and continues early in the morning. If you still need a ride to the other side, call the number found <a href='https://www.finferries.fi/en/ferry-traffic/ferries-and-schedules/vartsala.html)'>here</a>."
+    );
+  }
 
   return filtered;
 };
@@ -66,14 +72,14 @@ bot.on("message", (ctx) =>
 
 bot.action("Vartsala", (ctx) => {
   const location = "Vartsala";
-  return getMessage(location).then((i) =>
+  return getMessage(ctx, location).then((i) =>
     ctx.replyWithHTML(formatMessage(i, location))
   );
 });
 
 bot.action("mainland", (ctx) => {
   const location = "mainland";
-  return getMessage(location).then((i) =>
+  return getMessage(ctx, location).then((i) =>
     ctx.replyWithHTML(formatMessage(i, location))
   );
 });
