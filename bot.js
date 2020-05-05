@@ -1,6 +1,5 @@
 const { Telegraf } = require("telegraf");
 const Markup = require("telegraf/markup");
-const Extra = require("telegraf/extra");
 
 const got = require("got");
 const moment = require("moment");
@@ -22,7 +21,7 @@ const getSchedule = async () => {
 const getMessage = async (location) => {
   const [scheduleVartsala, scheduleMainland] = await getSchedule();
   const schedule =
-    location === "vartsala" ? scheduleVartsala : scheduleMainland;
+    location === "Vartsala" ? scheduleVartsala : scheduleMainland;
   const filtered =
     filter(schedule).length > 0
       ? filter(schedule).slice(0, 3)
@@ -31,40 +30,51 @@ const getMessage = async (location) => {
   return filtered;
 };
 
-const formatMessage = (timeArray) =>
+const formatMessage = (timeArray, currLocation) =>
   timeArray.reduce(
-    (acc, curr) => acc + `<b>${curr} </b>`,
-    "Next departure times: "
+    (acc, curr) => acc + `<b>${curr}   </b>`,
+    `Next departure times from ${currLocation}: \n`
   );
 
 const filter = (arr) => arr.filter((time) => time > moment().format("HH:mm"));
 
 const bot = new Telegraf(process.env.LOSSI_BOT_TOKEN);
 
+const inlineMessageKeyboard = Markup.inlineKeyboard([
+  Markup.callbackButton("Vartsala (island)", "Vartsala"),
+  Markup.callbackButton("Kivimaa (mainland)", "mainland"),
+]).extra();
+
 bot.start(async (ctx) => {
-  ctx.reply(
-    "Welcome to check the next departure times for Vartsalan lossi in Kustavi, Finland!"
+  ctx.replyWithHTML(
+    "Welcome to check the next departure times for Vartsalan lossi in Kustavi, Finland! <b>Send any message to the bot to wake it up.</b>"
   );
 });
-bot.help((ctx) => ctx.reply("Use the following commands to do stuff ..."));
-bot.on("sticker", (ctx) => ctx.reply("⛴"));
+bot.help((ctx) =>
+  ctx.reply("Send any message to the bot to get the next departures.")
+);
 
-bot.command("next", ({ reply }) => {
-  reply(
-    "One time keyboard",
-    Markup.keyboard(["/vartsala", "/mainland"]).oneTime().resize().extra()
+bot.on("sticker", (ctx) => ctx.reply("⛴ Try sending me a message."));
+
+bot.on("message", (ctx) =>
+  ctx.telegram.sendMessage(
+    ctx.from.id,
+    "Hi there! Where are you?",
+    inlineMessageKeyboard
+  )
+);
+
+bot.action("Vartsala", (ctx) => {
+  const location = "Vartsala";
+  return getMessage(location).then((i) =>
+    ctx.replyWithHTML(formatMessage(i, location))
   );
 });
 
-bot.command("vartsala", (ctx) => {
-  return getMessage("vartsala").then((i) =>
-    ctx.replyWithHTML(formatMessage(i))
-  );
-});
-
-bot.command("mainland", (ctx) => {
-  return getMessage("mainland").then((i) =>
-    ctx.replyWithHTML(formatMessage(i))
+bot.action("mainland", (ctx) => {
+  const location = "mainland";
+  return getMessage(location).then((i) =>
+    ctx.replyWithHTML(formatMessage(i, location))
   );
 });
 bot.launch();
