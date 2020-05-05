@@ -1,5 +1,7 @@
 const { Telegraf } = require("telegraf");
 const Markup = require("telegraf/markup");
+const express = require("express");
+const expressApp = express();
 
 const got = require("got");
 const moment = require("moment");
@@ -51,7 +53,7 @@ const TOKEN = process.env.LOSSI_BOT_TOKEN || "";
 const bot = new Telegraf(TOKEN);
 
 bot.telegram.setWebhook(`${URL}/bot${TOKEN}`);
-bot.startWebhook(`/bot${TOKEN}`, null, PORT);
+expressApp.use(bot.webhookCallback(`/bot${TOKEN}`));
 
 const inlineMessageKeyboard = Markup.inlineKeyboard([
   Markup.callbackButton("Vartsala (island)", "Vartsala"),
@@ -91,3 +93,11 @@ bot.action("mainland", (ctx) => {
   );
 });
 bot.launch();
+
+expressApp.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
+expressApp.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
