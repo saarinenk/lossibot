@@ -31,7 +31,7 @@ const getMessage = async (ctx, location) => {
 
   if (filter(schedule).length < 3) {
     ctx.replyWithHTML(
-      "The ferry stops running around 23 and continues early in the morning. If you still need a ride to the other side, call the number found <a href='https://www.finferries.fi/en/ferry-traffic/ferries-and-schedules/vartsala.html'>here</a>."
+      "It's getting late. The ferry stops running around 23 and continues early in the morning. If you still need a ride to the other side, call the number found <a href='https://www.finferries.fi/en/ferry-traffic/ferries-and-schedules/vartsala.html'>here</a>."
     );
   }
 
