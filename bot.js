@@ -65,7 +65,13 @@ bot.start(async (ctx) => {
   ctx.replyWithHTML(
     "Welcome to check the next departure times for Vartsalan lossi in Kustavi, Finland! <b>Send any message to the bot to wake it up.</b>"
   );
+  await ctx.telegram.sendMessage(
+    ctx.from.id,
+    "Hi there! Where are you?",
+    inlineMessageKeyboard
+  );
 });
+
 bot.help((ctx) =>
   ctx.reply("Send any message to the bot to get the next departures.")
 );
