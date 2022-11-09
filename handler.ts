@@ -1,6 +1,7 @@
-const { Telegraf } = require("telegraf");
-const { botCommands } = require("./botCommands");
-var AWS = require("aws-sdk");
+import { Telegraf } from "telegraf";
+import { botCommands } from "./botCommands";
+import AWS from "aws-sdk";
+import { APIGatewayProxyEventV2 } from "aws-lambda";
 
 AWS.config.update({ region: "eu-north-1" });
 var ssm = new AWS.SSM();
@@ -12,11 +13,14 @@ const tokenPromise = ssm
   })
   .promise();
 
-module.exports.webhook = async (event) => {
-  const token = await tokenPromise;
-  const bot = new Telegraf(token.Parameter.Value, {
+export const webhook = async (event: APIGatewayProxyEventV2) => {
+  const tokenObj = await tokenPromise;
+  const tokenValue = tokenObj?.Parameter?.Value ?? "";
+
+  const bot = new Telegraf(tokenValue, {
     telegram: { webhookReply: true },
   });
+
   botCommands(bot);
 
   const response = {
@@ -41,9 +45,11 @@ module.exports.webhook = async (event) => {
   return response;
 };
 
-module.exports.setWebhook = async (event) => {
-  const token = await tokenPromise;
-  const bot = new Telegraf(token.Parameter.Value, {
+export const setWebhook = async (event) => {
+  const tokenObj = await tokenPromise;
+  const tokenValue = tokenObj?.Parameter?.Value ?? "";
+
+  const bot = new Telegraf(tokenValue, {
     telegram: { webhookReply: true },
   });
 
