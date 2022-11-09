@@ -45,7 +45,7 @@ export const webhook = async (event: APIGatewayProxyEventV2) => {
   return response;
 };
 
-export const setWebhook = async (event) => {
+export const setWebhook = async (event: APIGatewayProxyEventV2) => {
   const tokenObj = await tokenPromise;
   const tokenValue = tokenObj?.Parameter?.Value ?? "";
 

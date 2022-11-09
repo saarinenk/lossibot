@@ -2,9 +2,9 @@
   "name": "lossi-bot",
   "version": "1.0.0",
   "description": "A telegram bot for finding the next departure(s) for Vartsalan lossi in Kustavi, Finland.",
-  "main": "bot.js",
+  "main": "handler.ts",
   "scripts": {
-    "start": "node bot.js",
+    "start": "ts-node-esm handler.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "NODE_ENV=development nodemon bot.js"
   },
@@ -24,6 +24,7 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
+    "@types/got": "^9.6.12",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1250.0",
     "got": "^11.1.0",
