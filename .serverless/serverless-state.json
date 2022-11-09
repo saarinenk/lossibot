@@ -6,6 +6,19 @@
     },
     "provider": {
       "name": "aws",
+      "iam": {
+        "role": {
+          "statements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ssm:GetParameter"
+              ],
+              "Resource": "arn:aws:ssm:eu-north-1:523941437498:parameter/lossibot/prod/token"
+            }
+          ]
+        }
+      },
       "runtime": "nodejs16.x",
       "stage": "prod",
       "region": "eu-north-1",
@@ -151,6 +164,9 @@
                             "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/lossibot-prod*:*:*"
                           }
                         ]
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iam\"][\"role\"][\"statements\"][0]"
                       }
                     ]
                   }
@@ -179,18 +195,13 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/lossibot/prod/1667986127116-2022-11-09T09:28:47.116Z/lossibot.zip"
+                "S3Key": "serverless/lossibot/prod/1667994880595-2022-11-09T11:54:40.595Z/lossibot.zip"
               },
               "Handler": "handler.webhook",
               "Runtime": "nodejs16.x",
               "FunctionName": "lossibot-prod-webhook",
               "MemorySize": 1024,
               "Timeout": 6,
-              "Environment": {
-                "Variables": {
-                  "LOSSI_BOT_TOKEN": "961771908:AAElZggwSE1jaOaseRyf_9cQ6XJq_B2WWV0"
-                }
-              },
               "Role": {
                 "Fn::GetAtt": [
                   "IamRoleLambdaExecution",
@@ -209,18 +220,13 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/lossibot/prod/1667986127116-2022-11-09T09:28:47.116Z/lossibot.zip"
+                "S3Key": "serverless/lossibot/prod/1667994880595-2022-11-09T11:54:40.595Z/lossibot.zip"
               },
               "Handler": "handler.setWebhook",
               "Runtime": "nodejs16.x",
               "FunctionName": "lossibot-prod-set-webhook",
               "MemorySize": 1024,
               "Timeout": 6,
-              "Environment": {
-                "Variables": {
-                  "LOSSI_BOT_TOKEN": "961771908:AAElZggwSE1jaOaseRyf_9cQ6XJq_B2WWV0"
-                }
-              },
               "Role": {
                 "Fn::GetAtt": [
                   "IamRoleLambdaExecution",
@@ -232,24 +238,24 @@
               "SetDashwebhookLogGroup"
             ]
           },
-          "WebhookLambdaVersionXeKbAq0fx8O4uCmcR1BUsS8IIzmYS2KtE1ztR34": {
+          "WebhookLambdaVersion2vCzd4doQ0VoUKHXK9oWMv2BonBtCq4gHi1ZT6hUJU": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "WebhookLambdaFunction"
               },
-              "CodeSha256": "lKIHJ0RqfQXVR1BZMAK8hfXUrJo1PZo4Dipa5+aijcs="
+              "CodeSha256": "fMXBw/VPS0z7Z766X7pGHtaaYKTud434qOAR+KLbCV0="
             }
           },
-          "SetDashwebhookLambdaVersionnyqiCv9Nfi2mYvolilLDhFHtu8A8bUqKuhejL136c": {
+          "SetDashwebhookLambdaVersionOw06AlYEBfxcf4wvWtRhsfSfO9w1QHzfkb5jWy5iPz4": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "SetDashwebhookLambdaFunction"
               },
-              "CodeSha256": "lKIHJ0RqfQXVR1BZMAK8hfXUrJo1PZo4Dipa5+aijcs="
+              "CodeSha256": "fMXBw/VPS0z7Z766X7pGHtaaYKTud434qOAR+KLbCV0="
             }
           },
           "ApiGatewayRestApi": {
@@ -476,7 +482,7 @@
               "SetDashwebhookLambdaPermissionApiGateway"
             ]
           },
-          "ApiGatewayDeployment1667986125627": {
+          "ApiGatewayDeployment1667994878490": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -578,7 +584,7 @@
           "WebhookLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WebhookLambdaVersionXeKbAq0fx8O4uCmcR1BUsS8IIzmYS2KtE1ztR34"
+              "Ref": "WebhookLambdaVersion2vCzd4doQ0VoUKHXK9oWMv2BonBtCq4gHi1ZT6hUJU"
             },
             "Export": {
               "Name": "sls-lossibot-prod-WebhookLambdaFunctionQualifiedArn"
@@ -587,7 +593,7 @@
           "SetDashwebhookLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "SetDashwebhookLambdaVersionnyqiCv9Nfi2mYvolilLDhFHtu8A8bUqKuhejL136c"
+              "Ref": "SetDashwebhookLambdaVersionOw06AlYEBfxcf4wvWtRhsfSfO9w1QHzfkb5jWy5iPz4"
             },
             "Export": {
               "Name": "sls-lossibot-prod-SetDashwebhookLambdaFunctionQualifiedArn"
@@ -709,9 +715,6 @@
     "functions": {
       "webhook": {
         "handler": "handler.webhook",
-        "environment": {
-          "LOSSI_BOT_TOKEN": "961771908:AAElZggwSE1jaOaseRyf_9cQ6XJq_B2WWV0"
-        },
         "events": [
           {
             "http": {
@@ -744,13 +747,10 @@
         "timeout": 6,
         "runtime": "nodejs16.x",
         "vpc": {},
-        "versionLogicalId": "WebhookLambdaVersionXeKbAq0fx8O4uCmcR1BUsS8IIzmYS2KtE1ztR34"
+        "versionLogicalId": "WebhookLambdaVersion2vCzd4doQ0VoUKHXK9oWMv2BonBtCq4gHi1ZT6hUJU"
       },
       "set-webhook": {
         "handler": "handler.setWebhook",
-        "environment": {
-          "LOSSI_BOT_TOKEN": "961771908:AAElZggwSE1jaOaseRyf_9cQ6XJq_B2WWV0"
-        },
         "events": [
           {
             "http": {
@@ -783,7 +783,7 @@
         "timeout": 6,
         "runtime": "nodejs16.x",
         "vpc": {},
-        "versionLogicalId": "SetDashwebhookLambdaVersionnyqiCv9Nfi2mYvolilLDhFHtu8A8bUqKuhejL136c"
+        "versionLogicalId": "SetDashwebhookLambdaVersionOw06AlYEBfxcf4wvWtRhsfSfO9w1QHzfkb5jWy5iPz4"
       }
     },
     "configValidationMode": "warn",
@@ -802,7 +802,7 @@
     "artifact": "/Users/katrisaarinen/Documents/Dev/lossibot/.serverless/lossibot.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/lossibot/prod/1667986127116-2022-11-09T09:28:47.116Z",
+    "artifactDirectoryName": "serverless/lossibot/prod/1667994880595-2022-11-09T11:54:40.595Z",
     "artifact": "lossibot.zip"
   }
 }

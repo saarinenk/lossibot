@@ -2,6 +2,14 @@ service: lossibot
 
 provider:
   name: aws
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - "ssm:GetParameter"
+          Resource:
+            - "arn:aws:ssm:eu-north-1:523941437498:parameter/lossibot/prod/token"
   runtime: nodejs16.x
   stage: prod
   region: eu-north-1
@@ -9,8 +17,6 @@ provider:
 functions:
   webhook:
     handler: handler.webhook
-    environment:
-      LOSSI_BOT_TOKEN: ${ssm:/lossibot/prod/token}
     events:
       - http:
           path: webhook
@@ -18,8 +24,6 @@ functions:
           cors: true
   set-webhook:
     handler: handler.setWebhook
-    environment:
-      LOSSI_BOT_TOKEN: ${ssm:/lossibot/prod/token}
     events:
       - http:
           path: setWebhook

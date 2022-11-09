@@ -1,12 +1,24 @@
 const { Telegraf } = require("telegraf");
 const { botCommands } = require("./botCommands");
+var AWS = require("aws-sdk");
 
-const TOKEN = process.env.LOSSI_BOT_TOKEN || "";
-const bot = new Telegraf(TOKEN, { telegram: { webhookReply: true } });
+AWS.config.update({ region: "eu-north-1" });
+var ssm = new AWS.SSM();
 
-botCommands(bot);
+const tokenPromise = ssm
+  .getParameter({
+    Name: "/lossibot/prod/token",
+    WithDecryption: true,
+  })
+  .promise();
 
 module.exports.webhook = async (event) => {
+  const token = await tokenPromise;
+  const bot = new Telegraf(token.Parameter.Value, {
+    telegram: { webhookReply: true },
+  });
+  botCommands(bot);
+
   const response = {
     statusCode: 200,
     headers: {
@@ -30,12 +42,17 @@ module.exports.webhook = async (event) => {
 };
 
 module.exports.setWebhook = async (event) => {
+  const token = await tokenPromise;
+  const bot = new Telegraf(token.Parameter.Value, {
+    telegram: { webhookReply: true },
+  });
+
   const response = {
     statusCode: 404,
     headers: {
       "Access-Control-Allow-Origin": "*",
     },
-    body: "Not Found",
+    body: "",
   };
 
   try {
