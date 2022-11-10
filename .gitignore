@@ -25,6 +25,5 @@ yarn-error.log*
 admin.env
 .env
 _meta
-.serverless/**
-/.serverless/
-/.serverless/*.json
+.serverless
+.build
