@@ -1,5 +1,6 @@
 import Telegraf, { Markup } from "telegraf";
 import moment from "moment";
+import "moment-timezone";
 import got from "got/dist/source";
 import { TelegrafContext } from "telegraf/typings/context";
 import { Response } from "got";

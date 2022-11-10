@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf";
 import { botCommands } from "./botCommands";
-import AWS from "aws-sdk";
 import { APIGatewayProxyEventV2 } from "aws-lambda";
+import * as AWS from "aws-sdk";
 
 AWS.config.update({ region: "eu-north-1" });
 var ssm = new AWS.SSM();

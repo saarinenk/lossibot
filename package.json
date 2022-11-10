@@ -5,8 +5,7 @@
   "main": "handler.ts",
   "scripts": {
     "start": "ts-node-esm handler.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "NODE_ENV=development nodemon bot.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -20,7 +19,7 @@
   "homepage": "https://github.com/saarinenk/lossibot#readme",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.108",
-    "nodemon": "^2.0.3",
+    "serverless-plugin-typescript": "^2.1.4",
     "typescript": "^4.8.4"
   },
   "dependencies": {
