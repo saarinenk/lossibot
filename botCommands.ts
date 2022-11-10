@@ -1,23 +1,60 @@
-const Markup = require("telegraf/markup");
-const got = require("got");
-var moment = require("moment-timezone");
+import Telegraf, { Markup } from "telegraf";
+import moment from "moment";
+import "moment-timezone";
+import got from "got/dist/source";
+import { TelegrafContext } from "telegraf/typings/context";
+import { Response } from "got";
+
+interface FerrySchedule {
+  sections: Sections;
+}
+
+interface Sections {
+  [key: string]: Ferry[];
+}
+
+interface Ferry {
+  id: number;
+  name: string;
+  owner: number;
+  link: string;
+  categories: string[];
+  published: number;
+  "aikataulu-voimassa-alkaen": Date;
+  "aikataulu-voimassa-paattyy": Date;
+  lahto: string;
+  lahtoajat: string[];
+  lisatietoja: string;
+  paluu: string;
+  paluuajat: string[];
+  viikonpaiva: string[];
+}
+
+type Location = "Vartsala" | "mainland";
 
 const getSchedule = async () => {
   try {
-    const response = await got(
+    const response: Response<FerrySchedule> = await got(
       "https://www.finferries.fi/en/koodiviidakko/timetable/vartsala-19.9.2016.json",
       { responseType: "json" }
     );
-    const vartsala = response.body.sections["31"][0].lahtoajat;
-    const mainland = response.body.sections["31"][0].paluuajat;
+
+    console.log(response, response.body);
+    const vartsala: string[] = response.body.sections["31"][0].lahtoajat;
+    const mainland: string[] = response.body.sections["31"][0].paluuajat;
+
     return [vartsala, mainland];
   } catch (error) {
     console.log("error:", error);
   }
 };
 
-const getMessage = async (ctx, location) => {
-  const [scheduleVartsala, scheduleMainland] = await getSchedule();
+const getMessage = async (ctx: TelegrafContext, location: Location) => {
+  const [scheduleVartsala, scheduleMainland] = (await getSchedule()) || [
+    [],
+    [],
+  ];
+
   const schedule =
     location === "Vartsala" ? scheduleVartsala : scheduleMainland;
   const filtered =
@@ -34,13 +71,13 @@ const getMessage = async (ctx, location) => {
   return filtered;
 };
 
-const formatMessage = (timeArray, currLocation) =>
+const formatMessage = (timeArray: string[], currLocation: Location) =>
   timeArray.reduce(
     (acc, curr) => acc + `<b>${curr}   </b>`,
     `Next departure times from ${currLocation}: \n`
   );
 
-const filter = (arr) =>
+const filter = (arr: string[]) =>
   arr.filter((time) => time > moment().tz("Europe/Helsinki").format("HH:mm"));
 
 const inlineMessageKeyboard = Markup.inlineKeyboard([
@@ -48,16 +85,17 @@ const inlineMessageKeyboard = Markup.inlineKeyboard([
   Markup.callbackButton("Kivimaa (mainland)", "mainland"),
 ]).extra();
 
-const botCommands = (bot) => {
+export const botCommands = (bot: Telegraf<TelegrafContext>) => {
   bot.start(async (ctx) => {
     ctx.replyWithHTML(
       "Welcome to check the next departure times for Vartsalan lossi in Kustavi, Finland! <b>Send any message to the bot to wake it up.</b>"
     );
-    await ctx.telegram.sendMessage(
-      ctx.from.id,
-      "Hi there! Where are you?",
-      inlineMessageKeyboard
-    );
+    ctx.from?.id &&
+      (await ctx.telegram.sendMessage(
+        ctx.from.id,
+        "Hi there! Where are you?",
+        inlineMessageKeyboard
+      ));
   });
 
   bot.help((ctx) =>
@@ -66,27 +104,26 @@ const botCommands = (bot) => {
 
   bot.on("sticker", (ctx) => ctx.reply("⛴ Try sending me a message."));
 
-  bot.on("message", (ctx) =>
-    ctx.telegram.sendMessage(
-      ctx.from.id,
-      "Hi there! Where are you?",
-      inlineMessageKeyboard
-    )
-  );
+  bot.on("message", (ctx) => {
+    ctx.from?.id &&
+      ctx.telegram.sendMessage(
+        ctx.from.id,
+        "Hi there! Where are you?",
+        inlineMessageKeyboard
+      );
+  });
 
   bot.action("Vartsala", (ctx) => {
-    const location = "Vartsala";
+    const location: Location = "Vartsala";
     return getMessage(ctx, location).then((i) =>
       ctx.replyWithHTML(formatMessage(i, location))
     );
   });
 
   bot.action("mainland", (ctx) => {
-    const location = "mainland";
+    const location: Location = "mainland";
     return getMessage(ctx, location).then((i) =>
       ctx.replyWithHTML(formatMessage(i, location))
     );
   });
 };
-
-module.exports = { botCommands };
