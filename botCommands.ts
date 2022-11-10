@@ -1,9 +1,8 @@
 import Telegraf, { Markup } from "telegraf";
-import moment from "moment";
-import "moment-timezone";
 import got from "got/dist/source";
 import { TelegrafContext } from "telegraf/typings/context";
 import { Response } from "got";
+import { formatInTimeZone } from "date-fns-tz";
 
 interface FerrySchedule {
   sections: Sections;
@@ -77,8 +76,10 @@ const formatMessage = (timeArray: string[], currLocation: Location) =>
     `Next departure times from ${currLocation}: \n`
   );
 
-const filter = (arr: string[]) =>
-  arr.filter((time) => time > moment().tz("Europe/Helsinki").format("HH:mm"));
+const filter = (arr: string[]) => {
+  const currTime = formatInTimeZone(new Date(), "Europe/Helsinki", "HH:mm");
+  return arr.filter((time) => time > currTime);
+};
 
 const inlineMessageKeyboard = Markup.inlineKeyboard([
   Markup.callbackButton("Vartsala (island)", "Vartsala"),
