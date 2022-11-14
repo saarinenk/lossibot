@@ -105,13 +105,13 @@ export const botCommands = (bot: Telegraf<TelegrafContext>) => {
 
   bot.on("sticker", (ctx) => ctx.reply("⛴ Try sending me a message."));
 
-  bot.on("message", (ctx) => {
-    ctx.from?.id &&
-      ctx.telegram.sendMessage(
+  bot.on("text", async (ctx) => {
+    ctx.from &&
+      (await ctx.telegram.sendMessage(
         ctx.from.id,
         "Hi there! Where are you?",
         inlineMessageKeyboard
-      );
+      ));
   });
 
   bot.action("Vartsala", (ctx) => {
