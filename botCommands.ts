@@ -114,17 +114,15 @@ export const botCommands = (bot: Telegraf<TelegrafContext>) => {
       ));
   });
 
-  bot.action("Vartsala", (ctx) => {
+  bot.action("Vartsala", async (ctx) => {
     const location: Location = "Vartsala";
-    return getMessage(ctx, location).then((i) =>
-      ctx.replyWithHTML(formatMessage(i, location))
-    );
+    const message = await getMessage(ctx, location);
+    return await ctx.replyWithHTML(formatMessage(message, location));
   });
 
-  bot.action("mainland", (ctx) => {
+  bot.action("mainland", async (ctx) => {
     const location: Location = "mainland";
-    return getMessage(ctx, location).then((i) =>
-      ctx.replyWithHTML(formatMessage(i, location))
-    );
+    const message = await getMessage(ctx, location);
+    return await ctx.replyWithHTML(formatMessage(message, location));
   });
 };
