@@ -1,8 +1,9 @@
-import Telegraf, { Markup } from "telegraf";
+import { Markup, Telegraf } from "telegraf";
 import got from "got/dist/source";
-import { TelegrafContext } from "telegraf/typings/context";
+import Context from "telegraf/typings/context";
 import { Response } from "got";
 import { formatInTimeZone } from "date-fns-tz";
+import { Update } from "telegraf/typings/core/types/typegram";
 
 interface FerrySchedule {
   sections: Sections;
@@ -48,7 +49,7 @@ const getSchedule = async () => {
   }
 };
 
-const getMessage = async (ctx: TelegrafContext, location: Location) => {
+const getMessage = async (ctx: Context, location: Location) => {
   const [scheduleVartsala, scheduleMainland] = (await getSchedule()) || [
     [],
     [],
@@ -82,11 +83,11 @@ const filter = (arr: string[]) => {
 };
 
 const inlineMessageKeyboard = Markup.inlineKeyboard([
-  Markup.callbackButton("Vartsala (island)", "Vartsala"),
-  Markup.callbackButton("Kivimaa (mainland)", "mainland"),
-]).extra();
+  Markup.button.callback("Vartsala (island)", "Vartsala"),
+  Markup.button.callback("Kivimaa (mainland)", "mainland"),
+]);
 
-export const botCommands = (bot: Telegraf<TelegrafContext>) => {
+export const botCommands = (bot: Telegraf<Context<Update>>) => {
   bot.start(async (ctx) => {
     ctx.replyWithHTML(
       "Welcome to check the next departure times for Vartsalan lossi in Kustavi, Finland! <b>Send any message to the bot to wake it up.</b>"
