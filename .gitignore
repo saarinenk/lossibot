@@ -27,3 +27,5 @@ admin.env
 _meta
 .serverless
 .build
+
+.vscode
