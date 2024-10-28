@@ -14,7 +14,7 @@ provider:
             - "ssm:GetParameter"
           Resource:
             - "arn:aws:ssm:eu-north-1:523941437498:parameter/lossibot/prod/token"
-  runtime: nodejs16.x
+  runtime: nodejs20.x
   stage: prod
   region: eu-north-1
 
