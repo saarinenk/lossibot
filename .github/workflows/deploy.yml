@@ -13,11 +13,16 @@ jobs:
           node-version: 20
       - name: Install Serverless
         run: npm install -g serverless
-      - name: Add AWS authentication for Serverless
-        run: sls config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      # - name: Add AWS authentication for Serverless
+      #   run: sls config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: Install NPM dependencies
         run: npm install
       - name: Deploy Lambda functions
+        env:
+            AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION: ${{ secrets.AWS_REGION }}
+            SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
         run: sls deploy
       - name: Set webhook
         run: curl -X POST https://${{ secrets.AWS_API_ID }}.execute-api.eu-north-1.amazonaws.com/prod/setWebhook
