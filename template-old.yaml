@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM template for lossibot
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 30
+    MemorySize: 128
+    Environment:
+      Variables:
+        STAGE: prod
+    Policies:
+      - SSMParameterReadPolicy:
+          ParameterName: /lossibot/prod/token
+
+Resources:
+  WebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.webhook
+      Events:
+        WebhookPost:
+          Type: Api
+          Properties:
+            Path: /webhook
+            Method: post
+            Cors:
+              AllowMethods: "'POST'"
+              AllowHeaders: "'*'"
+              AllowOrigin: "'*'"
+
+  SetWebhookFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.setWebhook
+      Events:
+        SetWebhookPost:
+          Type: Api
+          Properties:
+            Path: /setWebhook
+            Method: post
+            Cors:
+              AllowMethods: "'POST'"
+              AllowHeaders: "'*'"
+              AllowOrigin: "'*'"
+
+Outputs:
+  WebhookApi:
+    Description: API Gateway endpoint URL for Webhook function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/webhook"
+  SetWebhookApi:
+    Description: API Gateway endpoint URL for SetWebhook function
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/setWebhook"
