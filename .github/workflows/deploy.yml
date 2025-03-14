@@ -19,7 +19,7 @@ jobs:
         run: |
           curl -fsSL https://github.com/aws/aws-sam-cli/releases/latest/download/aws-sam-cli-linux-x86_64.zip -o aws-sam-cli.zip
           unzip aws-sam-cli.zip -d sam-installation
-          sudo ./sam-installation/install
+          sudo ./sam-installation/install --update
           
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
