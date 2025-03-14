@@ -42,5 +42,5 @@ jobs:
         
       - name: Set webhook
         run: |
-          API_ID=$(aws cloudformation describe-stacks --stack-name lossibot --query 'Stacks[0].Outputs[?OutputKey==`WebhookEndpoint`].OutputValue' --output text | cut -d'/' -f3)
-          curl -X POST https://$API_ID.execute-api.eu-north-1.amazonaws.com/prod/setWebhook
+          API_URL=$(aws cloudformation describe-stacks --stack-name lossibot --query 'Stacks[0].Outputs[?OutputKey==`WebhookEndpoint`].OutputValue' --output text)
+          curl -X POST $API_URL/setWebhook
