@@ -4,11 +4,14 @@
     "strictNullChecks": true,
     "sourceMap": true,
     "allowJs": true,
-    "target": "es5",
-    "outDir": ".build",
+    "target": "es2020",
+    "module": "commonjs",
+    "outDir": "dist",
     "moduleResolution": "node",
-    "lib": ["es2015"],
+    "lib": ["es2020"],
     "rootDir": "./",
-    "esModuleInterop": true,
-  }
+    "esModuleInterop": true
+  },
+  "include": ["*.ts"],
+  "exclude": ["node_modules", "**/*.test.ts"]
 }

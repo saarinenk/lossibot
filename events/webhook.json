@@ -1,0 +1,20 @@
+{
+  "body": "{\"message\":{\"text\":\"test message\",\"chat\":{\"id\":123456789}}}",
+  "resource": "/webhook",
+  "path": "/webhook",
+  "httpMethod": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "requestContext": {
+    "resourcePath": "/webhook",
+    "httpMethod": "POST",
+    "path": "/webhook",
+    "requestTimeEpoch": 1234567890,
+    "requestId": "test-request-id",
+    "accountId": "123456789012",
+    "apiId": "test-api-id",
+    "stage": "prod"
+  },
+  "isBase64Encoded": false
+} 

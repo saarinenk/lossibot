@@ -1,22 +1,28 @@
 import { Telegraf } from "telegraf";
 import { botCommands } from "./botCommands";
-import { APIGatewayProxyEventV2 } from "aws-lambda";
-import * as AWS from "aws-sdk";
 
-AWS.config.update({ region: "eu-north-1" });
-var ssm = new AWS.SSM();
+const getToken = async () => {
+  // For local development, use a test token
+  if (process.env.STAGE === "local") {
+    return "test_token";
+  }
+  
+  // Only import AWS SDK if we need it
+  const AWS = await import('aws-sdk');
+  AWS.config.update({ region: "eu-north-1" });
+  const ssm = new AWS.SSM();
+  const tokenObj = await ssm
+    .getParameter({
+      Name: "/lossibot/prod/token",
+      WithDecryption: true,
+    })
+    .promise();
+  
+  return tokenObj?.Parameter?.Value ?? "";
+};
 
-const tokenPromise = ssm
-  .getParameter({
-    Name: "/lossibot/prod/token",
-    WithDecryption: true,
-  })
-  .promise();
-
-export const webhook = async (event: APIGatewayProxyEventV2) => {
-  const tokenObj = await tokenPromise;
-  const tokenValue = tokenObj?.Parameter?.Value ?? "";
-
+export const webhook = async (event: any) => {
+  const tokenValue = await getToken();
   const bot = new Telegraf(tokenValue, {
     telegram: { webhookReply: true },
   });
@@ -45,10 +51,8 @@ export const webhook = async (event: APIGatewayProxyEventV2) => {
   return response;
 };
 
-export const setWebhook = async (event: APIGatewayProxyEventV2) => {
-  const tokenObj = await tokenPromise;
-  const tokenValue = tokenObj?.Parameter?.Value ?? "";
-
+export const setWebhook = async (event: any) => {
+  const tokenValue = await getToken();
   const bot = new Telegraf(tokenValue, {
     telegram: { webhookReply: true },
   });
