@@ -4,12 +4,12 @@
   "description": "A telegram bot for finding the next departure(s) for Vartsalan lossi in Kustavi, Finland.",
   "main": "handler.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp -r node_modules dist/ && sam build",
     "prebuild": "rm -rf dist/",
     "prestart": "yarn build",
     "start": "sam local start-api",
     "dev": "yarn build && yarn start",
-    "deploy": "yarn build && sam deploy"
+    "deploy": "yarn build && sam deploy --region eu-north-1 --stack-name lossibot --resolve-s3 --capabilities CAPABILITY_IAM --no-confirm-changeset --no-fail-on-empty-changeset"
   },
   "repository": {
     "type": "git",

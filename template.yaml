@@ -28,7 +28,7 @@ Resources:
       Handler: handler.webhook
       Policies:
         - SSMParameterReadPolicy:
-            ParameterName: /lossibot/prod/token
+            ParameterName: lossibot/prod/token
         - Statement:
             - Effect: Allow
               Action:
@@ -51,7 +51,7 @@ Resources:
       Handler: handler.setWebhook
       Policies:
         - SSMParameterReadPolicy:
-            ParameterName: /lossibot/prod/token
+            ParameterName: lossibot/prod/token
         - Statement:
             - Effect: Allow
               Action:
