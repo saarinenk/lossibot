@@ -4,6 +4,7 @@ import Context from "telegraf/typings/context";
 import { Response } from "got";
 import { formatInTimeZone } from "date-fns-tz";
 import { Update } from "telegraf/typings/core/types/typegram";
+import * as cheerio from 'cheerio';
 
 interface FerrySchedule {
   sections: Sections;
@@ -32,52 +33,69 @@ interface Ferry {
 
 type Location = "Vartsala" | "mainland";
 
-const getSchedule = async () => {
+export const getSchedule = async () => {
   try {
-    const response: Response<FerrySchedule> = await got(
-      "https://www.finferries.fi/en/koodiviidakko/timetable/vartsala-19.9.2016.json",
-      { responseType: "json" }
+    const response = await got(
+      "https://www.finferries.fi/en/koodiviidakko/timetable/vartsala-1.7.2024-alkaen.html"
     );
 
-    console.log(response, response.body);
-    const vartsala: string[] = response.body.sections["31"][0].lahtoajat;
-    const mainland: string[] = response.body.sections["31"][0].paluuajat;
+    const $ = cheerio.load(response.body);
+    
+    // Extract Vartsala times
+    const vartsalaTimes: string[] = [];
+    $('ul').first().find('li').each((_, elem) => {
+      const text = $(elem).text().trim();
+      if (text.match(/^\d{2}:\d{2}/)) {
+        vartsalaTimes.push(text.substring(0, 5)); // Take only the time part (HH:mm)
+      }
+    });
 
-    return [vartsala, mainland];
+    // Extract mainland times
+    const mainlandTimes: string[] = [];
+    $('ul').last().find('li').each((_, elem) => {
+      const text = $(elem).text().trim();
+      if (text.match(/^\d{2}:\d{2}/)) {
+        mainlandTimes.push(text.substring(0, 5)); // Take only the time part (HH:mm)
+      }
+    });
+
+    return [vartsalaTimes, mainlandTimes];
   } catch (error) {
     console.log("error:", error);
+    return [[], []];
   }
 };
 
-const getMessage = async (ctx: Context, location: Location) => {
-  const [scheduleVartsala, scheduleMainland] = (await getSchedule()) || [
-    [],
-    [],
-  ];
-
-  const schedule =
-    location === "Vartsala" ? scheduleVartsala : scheduleMainland;
-  const filtered =
-    filter(schedule).length > 0
-      ? filter(schedule).slice(0, 3)
-      : schedule.slice(0, 3);
-
-  if (filter(schedule).length < 3) {
+export const getMessage = async (ctx: Context, location: Location) => {
+  const [scheduleVartsala, scheduleMainland] = await getSchedule() || [[], []];
+  const schedule = location === "Vartsala" ? scheduleVartsala : scheduleMainland;
+  
+  if (!schedule.length) {
     ctx.replyWithHTML(
-      "It's getting late. The ferry stops running around 23 and continues early in the morning. If you still need a ride to the other side, call the number found <a href='https://www.finferries.fi/en/ferry-traffic/ferries-and-schedules/vartsala.html'>here</a>."
+      "Sorry, I couldn't fetch the ferry schedule. Please try again later or check the schedule directly at <a href='https://www.finferries.fi/en/ferry-traffic/ferries-and-schedules/vartsala.html'>Finferries website</a>."
     );
+    return [];
   }
 
-  return filtered;
+  const filtered = filter(schedule);
+  
+  if (filtered.length === 0) {
+    ctx.replyWithHTML(
+      "It's getting late. The ferry stops running around 23 and continues early in the morning. If you still need a ride to the other side, call +358 40 013 8239 to order a crossing."
+    );
+    return [];
+  }
+
+  return filtered.slice(0, 3);
 };
 
-const formatMessage = (timeArray: string[], currLocation: Location) =>
+export const formatMessage = (timeArray: string[], currLocation: Location) =>
   timeArray.reduce(
     (acc, curr) => acc + `<b>${curr}   </b>`,
     `Next departure times from ${currLocation}: \n`
   );
 
-const filter = (arr: string[]) => {
+export const filter = (arr: string[]) => {
   const currTime = formatInTimeZone(new Date(), "Europe/Helsinki", "HH:mm");
   return arr.filter((time) => time > currTime);
 };
